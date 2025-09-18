@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generar Factura</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="card shadow-sm">
+          <div class="card-body p-3">
+            <h2 class="card-title text-center mb-4 text-primary">Crear Factura</h2>
+            
+            <form id="invoiceForm">
+              <h4 class="text-secondary mb-3">Datos del cliente</h4>
+              
+              <div class="mb-2">
+                <label class="form-label">Nombre del cliente</label>
+                <input type="text" name="legal_name" class="form-control form-control-sm" required placeholder="Ej: Juan Pérez">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label">RFC del cliente</label>
+                <input type="text" name="tax_id" class="form-control form-control-sm" required placeholder="Ej: XAXX010101000">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label">Correo del cliente</label>
+                <input type="email" name="email" class="form-control form-control-sm" required placeholder="correo@ejemplo.com">
+              </div>
+
+              <h5 class="text-secondary mt-4 mb-3">Dirección del cliente</h5>
+
+              <div class="mb-2">
+                <label class="form-label">Calle</label>
+                <input type="text" name="street" class="form-control form-control-sm" required placeholder="Calle Falsa 123">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label">Colonia</label>
+                <input type="text" name="neighborhood" class="form-control form-control-sm" required placeholder="Colonia Centro">
+              </div>
+
+              <div class="row g-3 mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">Ciudad</label>
+                  <input type="text" name="city" class="form-control form-control-sm" required placeholder="Ciudad de México">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Estado</label>
+                  <input type="text" name="state" class="form-control form-control-sm" required placeholder="CDMX">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-2">
+                <div class="col-md-6">
+                  <label class="form-label">País</label>
+                  <input type="text" name="country" class="form-control form-control-sm" required value="MEX">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Código postal</label>
+                  <input type="text" name="zip" class="form-control form-control-sm" required placeholder="01234">
+                </div>
+              </div>
+
+              <h4 class="text-secondary mt-4 mb-3">Producto / Servicio</h4>
+
+              <div class="mb-2">
+                <label class="form-label">Descripción</label>
+                <input type="text" name="description" class="form-control form-control-sm" required placeholder="Servicio de consultoría">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label">Precio</label>
+                <input type="number" name="price" class="form-control form-control-sm" required placeholder="1000">
+              </div>
+
+              <button class="btn btn-primary btn-sm w-100">Generar Factura</button>
+            </form>
+
+            <div id="result" class="mt-4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const form = document.getElementById('invoiceForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      const payload = {
+        customer: {
+          legal_name: data.legal_name,
+          tax_id: data.tax_id,
+          email: data.email,
+          address: {
+            street: data.street,
+            neighborhood: data.neighborhood,
+            city: data.city,
+            state: data.state,
+            country: data.country,
+            zip: data.zip
+          }
+        },
+        items: [
+          {
+            quantity: 1,
+            product: {
+              description: data.description,
+              product_key: "81112100",
+              price: parseFloat(data.price),
+              tax_included: true
+            }
+          }
+        ],
+        use: "G03",
+        payment_form: "03",
+        payment_method: "PUE"
+      };
+
+      try {
+        const response = await fetch('/generate-invoice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if(result.success) {
+          resultDiv.innerHTML = `
+            <div class="alert alert-success">
+              Factura creada con ID: <strong>${result.id}</strong><br>
+              <a href="${result.pdf}" target="_blank" class="link-primary">Descargar PDF</a>
+              <a href="${result.xml}" target="_blank" class="link-primary ms-3">Descargar XML</a>
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${result.error}</div>`;
+        }
+      } catch(err) {
+        resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
+      }
+    });
+  </script>
+</body>
+</html>
