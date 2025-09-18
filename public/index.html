@@ -140,13 +140,11 @@
 
         const result = await response.json();
 
-        if(result.success) {
+         if(result.success){
           resultDiv.innerHTML = `
-            <div class="alert alert-success">
-              Factura creada con ID: <strong>${result.id}</strong><br>
-              <a href="${result.pdf}" target="_blank" class="link-primary">Descargar PDF</a>
-              <a href="${result.xml}" target="_blank" class="link-primary ms-3">Descargar XML</a>
-            </div>
+            <p>Factura creada con ID: ${result.id}</p>
+            <a href="${result.pdf}" download="factura.pdf">Descargar PDF</a><br>
+            <a href="${result.xml}" download="factura.xml">Descargar XML</a>
           `;
         } else {
           resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${result.error}</div>`;
