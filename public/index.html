@@ -132,7 +132,7 @@
       };
 
       try {
-        const response = await fetch('/generate-invoice', {
+        const response = await fetch('/api/generate-invoice', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
