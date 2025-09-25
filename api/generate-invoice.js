@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_KEY = 'sk_test_Ee01rLNqgyDxlMq2gNA0l01CPXPg5X2mpWBna9oGAd';
+const API_KEY = 'sk_live_BWEoO2XD8Jlgr3yMDEPYrbnFjRdd3az5mq4PLvxZ9R';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
