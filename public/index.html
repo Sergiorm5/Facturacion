@@ -28,6 +28,11 @@
               </div>
 
               <div class="mb-2">
+                <label class="form-label">Régimen Fiscal</label>
+                <input type="text" name="tax_system" class="form-control form-control-sm" required placeholder="Ej: 626">
+              </div>
+
+              <div class="mb-2">
                 <label class="form-label">Correo del cliente</label>
                 <input type="email" name="email" class="form-control form-control-sm" required placeholder="correo@ejemplo.com">
               </div>
@@ -74,11 +79,33 @@
               </div>
 
               <div class="mb-2">
+                <label class="form-label">Clave de producto/servicio (product_key)</label>
+                <input type="text" name="product_key" class="form-control form-control-sm" required placeholder="Ej: 81112100">
+              </div>
+
+              <div class="mb-2">
                 <label class="form-label">Precio</label>
                 <input type="number" name="price" class="form-control form-control-sm" required placeholder="1000">
               </div>
 
-              <button class="btn btn-primary btn-sm w-100">Generar Factura</button>
+              <h4 class="text-secondary mt-4 mb-3">Datos de la factura</h4>
+
+              <div class="mb-2">
+                <label class="form-label">Uso CFDI</label>
+                <input type="text" name="use" class="form-control form-control-sm" required placeholder="Ej: G03">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label">Forma de pago</label>
+                <input type="text" name="payment_form" class="form-control form-control-sm" required placeholder="Ej: 03">
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label">Método de pago</label>
+                <input type="text" name="payment_method" class="form-control form-control-sm" required placeholder="Ej: PUE">
+              </div>
+
+              <button class="btn btn-primary btn-sm w-100 mt-3">Generar Factura</button>
             </form>
 
             <div id="result" class="mt-4"></div>
@@ -105,7 +132,7 @@
         customer: {
           legal_name: data.legal_name,
           tax_id: data.tax_id,
-          tax_system: "626", 
+          tax_system: data.tax_system, // capturado del form
           email: data.email,
           address: {
             street: data.street,
@@ -121,15 +148,15 @@
             quantity: 1,
             product: {
               description: data.description,
-              product_key: "81112100",
+              product_key: parseInt(data.product_key), // capturado del form
               price: parseFloat(data.price),
               tax_included: true
             }
           }
         ],
-        use: "G03",
-        payment_form: "03",
-        payment_method: "PUE"
+        use: data.use, // capturado del form
+        payment_form: parseInt(data.payment_form), // capturado del form (numérico)
+        payment_method: data.payment_method // capturado del form
       };
 
       try {
@@ -141,7 +168,7 @@
 
         const result = await response.json();
 
-         if(result.success){
+        if(result.success){
           resultDiv.innerHTML = `
             <p>Factura creada con ID: ${result.id}</p>
             <a href="${result.pdf}" download="factura.pdf">Descargar PDF</a><br>
